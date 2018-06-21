@@ -21,6 +21,7 @@ class App extends Component {
 
     };
   };
+  // working as intended
   render() {
     return (
       <div className="App">
