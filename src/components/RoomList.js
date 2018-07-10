@@ -49,7 +49,7 @@ render() {
       <h1> Room List </h1>
       {this.state.rooms.map( room =>
           <li key = {room.key} >
-            {room.name}
+            <button onClick = { () => this.props.setActiveRoom(room)}>{room.name}</button>
           </li>
       )}
         <form onSubmit={ (e) => this.handleSubmit(e)}>

@@ -18,23 +18,25 @@ firebase.initializeApp(config);
 class App extends Component {
   constructor(props) {
     super(props);
-    this.state = {activeRoom: "", user: null};
-
+    this.state = {
+    activeRoom: null,
+    user: null
+    };
   };
 
-  activeRoom(room) {
+  setActiveRoom(room) {
     this.setState({activeRoom: room});
-    const roomKey = room === "" ? "" : room.key;
-    const roomTitle = room === "" ? "" : room.title;
+
   }
   // working as intended
   render() {
     return (
       <div className="App">
           <h1 className="App-title">Bloc Chat</h1>
-        <main>
-          <RoomList firebase = {firebase} />
-        </main>
+        <aside>
+          <RoomList firebase = {firebase} activeRoom = {this.state.activeRoom} setActiveRoom = {this.setActiveRoom.bind(this)}/>
+        </aside>
+        <MessageList firebase = {firebase} activeRoom ={this.state.activeRoom} />
       </div>
     );
   }
