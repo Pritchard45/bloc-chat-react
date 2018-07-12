@@ -72,8 +72,8 @@ class MessageList extends Component {
         <h3>Messages</h3>
         {this.state.messages.map( message =>
           <li key = {message.key}>
-            <p>{message.username}{message.content}</p>
-            <p>{message.roomId}<span format="MM/DD/YY hh:mm:ss A"></span>{message.sentAt}</p>
+            <p>{message.roomId}{message.username}{message.content}</p>
+            <p>{message.sentAt}</p>
           </li>
         )}
 
