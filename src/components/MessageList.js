@@ -3,7 +3,13 @@ import React, { Component } from 'react';
 class MessageList extends Component {
   constructor(props) {
     super(props);
-    this.state ={ username: "", content: "", sentAt: "", messages: [], roomId: ""};
+    this.state ={
+      messages: [],
+      username: "Alex ",
+      content: " ",
+      sentAt: " ",
+      roomId: " "};
+
   }
 
   componentDidMount() {
@@ -41,9 +47,8 @@ class MessageList extends Component {
     });
   }
 
-  createMessage(e) {
+  createMessage(content) {
     const messageRef = this.props.firebase.database().ref("messages/" + this.props.activeRoom);
-    e.preventDefault();
     if (this.confirmMessage()) {
       messageRef.push({
         username: this.state.username,
@@ -55,33 +60,29 @@ class MessageList extends Component {
     }
   }
 
-  componentWillReceiveProps(nxtProps) {
-    if (nxtProps.activeRoom !== this.props.activeRoom) {
-      const messageRef = this.props.firebase.database().ref("messages/" + nxtProps.activeRoom);
-      messageRef.on('value', snapshot => {
-        let messageChanges = [];
-        snapshot.forEach((message) => {
-          messageChanges.push({
-            key: message.key,
-            username: message.val().username,
-            content: message.val().content,
-            sentAt: message.val().sentAt,
-            roomId: message.val().roomId
-          });
-        });
-        this.setState({ messages: messageChanges});
-      });
-    }
+  handleSubmit(e) {
+    e.preventDefault();
+    this.createMessage(this.state.content);
   }
-
 
 
   render() {
     return (
-      <section>test</section>
+      <section>
+        <h3>Messages</h3>
+        {this.state.messages.map( message =>
+          <li key = {message.key}>
+            <p>{message.username}{message.content}</p>
+            <p>{message.roomId}<span format="MM/DD/YY hh:mm:ss A"></span>{message.sentAt}</p>
+          </li>
+        )}
 
-
-    )
+          <form onSubmit={ (e) => this.handleSubmit(e)}>
+            <input type="text" value={this.state.content} onChange={ (e) => this.handleChange(e) }/>
+            <input type="submit" value="Send Message"/>
+          </form>
+      </section>
+    );
   }
 }
 
