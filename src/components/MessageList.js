@@ -12,6 +12,7 @@ class MessageList extends Component {
 
   }
 
+
   componentDidMount() {
     const messagesRef = this.props.firebase.database().ref("messages/" + this.props.activeRoom);
     messagesRef.on('value', snapshot => {
@@ -21,7 +22,7 @@ class MessageList extends Component {
           key: message.key,
           username: message.val().username,
           content: message.val().content,
-          sentAt: message.val().sentAt,
+          sentAt: (new Date(message.sentAt)).toLocaleString('en-GB', {timeZone: 'EST'}),
           roomId: message.val().roomId
         });
       });
@@ -63,6 +64,9 @@ class MessageList extends Component {
   handleSubmit(e) {
     e.preventDefault();
     this.createMessage(this.state.content);
+  }
+  timeUpdate(e) {
+
   }
 
 
