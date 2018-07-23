@@ -8,14 +8,15 @@ class MessageList extends Component {
       username: "Alex ",
       content: " ",
       sentAt: " ",
-      roomId: " "};
-
+      roomId: " "
+    };
+    this.messagesRef = this.props.firebase.database().ref('messages');
   }
 
 
   componentDidMount() {
-    const messagesRef = this.props.firebase.database().ref("messages/" + this.props.activeRoom);
-    messagesRef.on('value', snapshot => {
+
+    this.messagesRef.on('value', snapshot => {
       const messageChanges = [];
       snapshot.forEach((message) => {
         messageChanges.push({
@@ -23,13 +24,23 @@ class MessageList extends Component {
           username: message.val().username,
           content: message.val().content,
           sentAt: (new Date(message.sentAt)).toLocaleString('en-GB', {timeZone: 'EST'}),
-          roomId: message.val().roomId
+          roomId: this.props.activeRoom
         });
       });
-      this.setState({ messages: messageChanges });
+      this.setState({ messages: messageChanges});
     });
   }
 
+/*
+  this.messagesRef.on('value', snapshot => {
+    const message = snapshot.val();
+
+})
+*/
+
+//filter Message method
+//which displays all the messages associated to a given roomId
+//use filter()
 
   confirmMessage(str) {
     const msgContent = str || this.state.content;
@@ -44,18 +55,17 @@ class MessageList extends Component {
       username: this.state.username,
       content: e.target.value,
       sentAt: this.props.firebase.database.ServerValue.TIMESTAMP,
-      roomId: this.state.roomId
+      roomId: this.props.activeRoom.key
     });
   }
 
   createMessage(content) {
-    const messageRef = this.props.firebase.database().ref("messages/" + this.props.activeRoom);
     if (this.confirmMessage()) {
-      messageRef.push({
+      this.messageRef.push({
         username: this.state.username,
         content: this.state.content,
         sentAt: this.state.sentAt,
-        roomId: this.state.roomId
+        roomId: this.props.activeRoom.key
       });
       this.setState({username: "", content: "", sentAt: ""});
     }
@@ -64,9 +74,6 @@ class MessageList extends Component {
   handleSubmit(e) {
     e.preventDefault();
     this.createMessage(this.state.content);
-  }
-  timeUpdate(e) {
-
   }
 
 
