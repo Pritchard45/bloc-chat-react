@@ -24,7 +24,7 @@ class MessageList extends Component {
           username: message.val().username,
           content: message.val().content,
           sentAt: (new Date(message.sentAt)).toLocaleString('en-GB', {timeZone: 'EST'}),
-          roomId: this.props.activeRoom
+          roomId: this.state.roomId
         });
       });
       this.setState({ messages: messageChanges});
@@ -55,17 +55,17 @@ class MessageList extends Component {
       username: this.state.username,
       content: e.target.value,
       sentAt: this.props.firebase.database.ServerValue.TIMESTAMP,
-      roomId: ''
+      roomId: this.state.roomId
     });
   }
 
   createMessage(content) {
     if (this.confirmMessage()) {
-      this.messageRef.push({
+      this.messagesRef.push({
         username: this.state.username,
         content: this.state.content,
         sentAt: this.state.sentAt,
-        roomId: ''
+        roomId: this.state.roomId
       });
       this.setState({username: "", content: "", sentAt: ""});
     }
@@ -81,7 +81,7 @@ class MessageList extends Component {
     return (
       <section>
         <h3>Messages</h3>
-        {this.state.messages.map( message =>
+        {this.state.messages.map( message => 
           <li key = {message.key}>
             <p>{message.roomId}{message.username}{message.content}</p>
             <p>{message.sentAt}</p>
