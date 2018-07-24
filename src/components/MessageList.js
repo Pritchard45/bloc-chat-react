@@ -55,7 +55,7 @@ class MessageList extends Component {
       username: this.state.username,
       content: e.target.value,
       sentAt: this.props.firebase.database.ServerValue.TIMESTAMP,
-      roomId: this.props.activeRoom.key
+      roomId: ''
     });
   }
 
@@ -65,7 +65,7 @@ class MessageList extends Component {
         username: this.state.username,
         content: this.state.content,
         sentAt: this.state.sentAt,
-        roomId: this.props.activeRoom.key
+        roomId: ''
       });
       this.setState({username: "", content: "", sentAt: ""});
     }
