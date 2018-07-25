@@ -5,30 +5,35 @@ class MessageList extends Component {
     super(props);
     this.state ={
       messages: [],
-      username: "Alex ",
-      content: " ",
-      sentAt: " ",
+      username: "Alex",
+      content: "",
+      sentAt: "",
+      roomId: ""
     };
     this.messagesRef = this.props.firebase.database().ref('messages');
+    this.handleChange = this.handleChange.bind(this);
+    this.createMessage = this.createMessage.bind(this);
   }
 
-/*
-  this.messagesRef.on('value', snapshot => {
+  componentDidMount() {
+  this.messagesRef.on('child_added', snapshot => {
     const message = snapshot.val();
+    message.key = snapshot.key;
+    this.setState({ messages: this.state.messages.concat( message ) });
+      });
+    };
 
-})
-*/
-
-//filter Message method
-//which displays all the messages associated to a given roomId
-//use filter()
-
-  confirmMessage(str) {
-    const msgContent = str || this.state.content;
-    const msgLength = msgContent.trim().length;
-    if (msgLength > 0) { return true; }
-    else { return false; }
-  }
+    createMessage(e) {
+      e.preventDefault();
+        this.messagesRef.push({
+          username: this.state.username,
+          content: this.state.content,
+          sentAt: this.state.sentAt,
+          roomId: this.state.roomId
+      });
+        this.setState({username: "", content: "", sentAt: "", message: ""});
+      e.target.reset();
+    }
 
   handleChange(e) {
     e.preventDefault();
@@ -36,49 +41,34 @@ class MessageList extends Component {
       username: this.state.username,
       content: e.target.value,
       sentAt: this.props.firebase.database.ServerValue.TIMESTAMP,
+      roomId: this.props.activeRoom
     });
   }
-
-  createMessage(content) {
-    if (this.confirmMessage()) {
-      this.messagesRef.push({
-        username: this.state.username,
-        content: this.state.content,
-        sentAt: this.state.sentAt,
-        roomId: this.props.activeRoom
-    });
-      this.setState({username: "", content: "", sentAt: ""});
-    }
-  }
-
-  handleSubmit(e) {
-    e.preventDefault();
-    this.createMessage(this.state.content);
-  }
-
 
   render() {
-    if (this.props.activeRoom) {
-      console.log(this.props.activeRoom.key);
-  }
+    let activeRoom = this.props.activeRoom
 
-    const filterMessages = this.state.messages.filter((message)=> {
-      console.log(message);
-      return message.roomId === this.props.activeRoom.key;
+    let currentMessages = (
+      this.state.messages.map((message) => {
+        console.log(message.roomId);
+        console.log(activeRoom);
+        if(message.roomId === activeRoom) {
+          return <ol key = {message.key}>{message.content}</ol>
+        }
+        return null;
+      })
+    )
 
-  });
     return (
       <section>
         <h3>Messages</h3>
-        {filterMessages.map( message =>
-          <ul key = {message.key}>
-            <li>{message.username}{message.content}{message.sentAt}</li>
-          </ul>
-        )}
-
-
-          <form onSubmit={ (e) => this.handleSubmit(e)}>
-            <input type="text" value={this.state.content} onChange={ (e) => this.handleChange(e) }/>
+        <div>
+        <div>
+        {currentMessages}
+        </div>
+        </div>
+          <form onSubmit={this.createMessage}>
+            <textarea type="text" placeholder="Enter message" onChange={ this.handleChange }/>
             <input type="submit" value="Send Message"/>
           </form>
       </section>
