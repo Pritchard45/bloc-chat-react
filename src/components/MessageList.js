@@ -12,14 +12,6 @@ class MessageList extends Component {
     this.messagesRef = this.props.firebase.database().ref('messages');
   }
 
-
-  componentDidMount() {
-    this.messagesRef.on('value', snapshot => {
-      this.props.activeRoom
-      });
-    }
-
-
 /*
   this.messagesRef.on('value', snapshot => {
     const message = snapshot.val();
@@ -44,7 +36,6 @@ class MessageList extends Component {
       username: this.state.username,
       content: e.target.value,
       sentAt: this.props.firebase.database.ServerValue.TIMESTAMP,
-      roomId: this.props.activeRoom
     });
   }
 
@@ -54,8 +45,8 @@ class MessageList extends Component {
         username: this.state.username,
         content: this.state.content,
         sentAt: this.state.sentAt,
-
-      });
+        roomId: this.props.activeRoom
+    });
       this.setState({username: "", content: "", sentAt: ""});
     }
   }
@@ -67,15 +58,24 @@ class MessageList extends Component {
 
 
   render() {
+    if (this.props.activeRoom) {
+      console.log(this.props.activeRoom.key);
+  }
+
+    const filterMessages = this.state.messages.filter((message)=> {
+      console.log(message);
+      return message.roomId === this.props.activeRoom.key;
+
+  });
     return (
       <section>
         <h3>Messages</h3>
-        {this.state.messages.map( message =>
-          <li key = {message.key}>
-            <p>{message.username}{message.content}</p>
-            <p>{message.sentAt}</p>
-          </li>
+        {filterMessages.map( message =>
+          <ul key = {message.key}>
+            <li>{message.username}{message.content}{message.sentAt}</li>
+          </ul>
         )}
+
 
           <form onSubmit={ (e) => this.handleSubmit(e)}>
             <input type="text" value={this.state.content} onChange={ (e) => this.handleChange(e) }/>

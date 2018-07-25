@@ -40,7 +40,7 @@ class RoomList extends Component {
 
 
 
-//got this to render//
+
 render() {
 
 
