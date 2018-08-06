@@ -52,9 +52,9 @@ class App extends Component {
         />
 
         <User
-          firebae = {firebase}
+          firebase = {firebase}
           setUser = {this.setUser}
-        />  
+        />
       </div>
     );
   }

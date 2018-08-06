@@ -1,19 +1,23 @@
 import React, { Component } from 'react';
 
-export class User extends Component {
+class User extends Component {
   constructor(props) {
     super(props);
+
+    this.signIn = this.signIn.bind(this);
+    this.signOut = this.signOut.bind(this);
   }
 
   signIn() {
     const provider = new this.props.firebase.auth.GoogleAuthProvider();
-    this.props.firebase.auth().signInWithPopup( provider );
+    this.props.firebase.auth().signInWithPopup( provider ).then((result) => {
+      const user = result.user;
+      this.props.setUser(user);
+    });
   }
 
   signOut(){
-    this.props.firebase.auth().signOut().then(() => {
-      this.props.setUser(null);
-    });
+    this.props.firebase.auth().signOut();
   }
 
   componentDidMount() {
@@ -24,17 +28,19 @@ export class User extends Component {
 
 
 
-  render()
+  render(){
     return(
-      <h5 onClick={this.signIn}>
-        Sign In
-      </h5>
-      <h5 onClick={this.signOut}>
-        Sign Out
-      </h5>
+      <div>
+        <h5 onClick={this.signIn}>Sign In</h5>
+        <h5 onClick={this.signOut}>Sign Out</h5>
+      </div>
+
 
     )
   }
+
+}
+
 
 
 export default User;
