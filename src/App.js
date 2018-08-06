@@ -53,7 +53,7 @@ class App extends Component {
 
         <User
           firebase = {firebase}
-          setUser = {this.setUser}
+          setUser = {this.setUser.bind(this)}
         />
       </div>
     );

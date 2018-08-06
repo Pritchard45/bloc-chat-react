@@ -19,6 +19,19 @@ class User extends Component {
   componentDidMount() {
     this.props.firebase.auth().onAuthStateChanged( user => {
       this.props.setUser(user);
+  /*
+  <<<<<!!!THIS IS CODE I WAS WORKING ON THAT THROWS AN ERROR!!!!!>>>
+          
+   const isActive = this.props.database().ref(".info/connected");
+      if(user) {
+        const userRef = this.props.firebase.database().ref("presence/" + user.uid);
+        isActive.on("value", snapshot =>{
+          if (snapshot.val()) {
+            userRef.update({user: this.props.user.displayName, isActive: true});
+            userRef.onDisconnect().update({isActive: false, currentRoom: "", roomId: ""})
+          }
+        });
+      }*/
     });
   }
 
