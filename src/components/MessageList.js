@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import Moment from 'moment';
 
 class MessageList extends Component {
   constructor(props) {
@@ -8,7 +9,8 @@ class MessageList extends Component {
       username: "",
       content: "",
       sentAt: "",
-      roomId: ""
+      roomId: "",
+      editMe: ""
     };
     this.messagesRef = this.props.firebase.database().ref('messages');
     this.handleChange = this.handleChange.bind(this);
@@ -31,11 +33,13 @@ class MessageList extends Component {
         this.messagesRef.push({
           username: this.props.user ? this.props.user.displayName : "Guest",
           content: this.state.content,
-          sentAt: this.props.firebase.database.ServerValue.TIMESTAMP,
+          sentAt: this.state.sentAt,
           roomId: this.state.roomId
+
+
       });
-        this.setState({username: "", content: "", sentAt: "", message: ""});
-      e.target.reset();
+        this.setState({username: "", content: "", sentAt: ""});
+
     }
 
   handleChange(e) {
@@ -45,6 +49,7 @@ class MessageList extends Component {
       content: e.target.value,
       sentAt: this.props.firebase.database.ServerValue.TIMESTAMP,
       roomId: this.props.activeRoom
+
     });
   }
 
@@ -52,13 +57,34 @@ class MessageList extends Component {
   this.messagesRef.child(message.key).remove();
 }
 
+updateMessage(e){
+  e.preventDefault();
+    const updatedTime = this.props.firebase.database.ServerValue.TIMESTAMP;
+    const messagesRef = this.props.firebase.database().ref("messages/" + "/" + this.state.editMe);
+    const updates = {};
+    updates["/content"] = this.input.value;
+    updates["/updatedTime"] = updatedTime;
+    messagesRef.update(updates);
+    this.setState({editMe: ""});
+}
+
+
+
+
   render() {
+    let realTime = this.state.messages.sentAt;
+    let format = Moment(realTime).format('LLL')
     let activeRoom = this.props.activeRoom
     let currentMessages = (
       this.state.messages.map((message) => {
         if(message.roomId === activeRoom) {
-          return <ol key = {message.key}>{message.username} {message.content} {message.sentAt}
+          return <ol key = {message.key}> {message.username} {message.content} {format}
           <button onClick = { () => this.deleteMessage(message)}>Useless Message?</button>
+          <form onSubmit={this.updatedMessage}>
+          <textarea type="text" defaultValue={message.content}/>
+          <button onClick={ (e) => this.setState({editMe: ""})}Edit/>
+          </form>
+
           </ol>
         }
         return null;
@@ -72,7 +98,6 @@ class MessageList extends Component {
         <div>
           <li>
             {currentMessages}
-
           </li>
         </div>
         </div>
