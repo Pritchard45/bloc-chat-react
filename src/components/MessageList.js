@@ -21,14 +21,17 @@ class MessageList extends Component {
     message.key = snapshot.key;
     this.setState({ messages: this.state.messages.concat( message ) });
       });
-    };
+    this.messagesRef.on('child_removed', snapshot  => {
+        this.setState({ messages: this.state.messages.filter( message => message.key !== snapshot.key )})
+  });
+}
 
     createMessage(e) {
       e.preventDefault();
         this.messagesRef.push({
           username: this.props.user ? this.props.user.displayName : "Guest",
           content: this.state.content,
-          sentAt: this.state.sentAt,
+          sentAt: this.props.firebase.database.ServerValue.TIMESTAMP,
           roomId: this.state.roomId
       });
         this.setState({username: "", content: "", sentAt: "", message: ""});
@@ -45,14 +48,18 @@ class MessageList extends Component {
     });
   }
 
+  deleteMessage(message) {
+  this.messagesRef.child(message.key).remove();
+}
+
   render() {
     let activeRoom = this.props.activeRoom
     let currentMessages = (
       this.state.messages.map((message) => {
-        console.log(message.roomId);
-        console.log(activeRoom);
         if(message.roomId === activeRoom) {
-          return <ol key = {message.key}>{message.username} {message.content} </ol>
+          return <ol key = {message.key}>{message.username} {message.content} {message.sentAt}
+          <button onClick = { () => this.deleteMessage(message)}>Useless Message?</button>
+          </ol>
         }
         return null;
       })
@@ -62,9 +69,11 @@ class MessageList extends Component {
       <section>
         <h3>Messages</h3>
         <div>
-
         <div>
-        {currentMessages}
+          <li>
+            {currentMessages}
+
+          </li>
         </div>
         </div>
           <form onSubmit={this.createMessage}>
