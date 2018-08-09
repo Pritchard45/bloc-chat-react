@@ -15,32 +15,32 @@ class MessageList extends Component {
     this.messagesRef = this.props.firebase.database().ref('messages');
     this.handleChange = this.handleChange.bind(this);
     this.createMessage = this.createMessage.bind(this);
+    this.editMessage = this.editMessage.bind(this);
   }
 
   componentDidMount() {
   this.messagesRef.on('child_added', snapshot => {
-    const message = snapshot.val();
-    message.key = snapshot.key;
-    this.setState({ messages: this.state.messages.concat( message ) });
-      });
+    const message = { val: snapshot.val(), key: snapshot.key}
+
+    this.setState({ messages: this.state.messages.concat( message ) })
+  });
     this.messagesRef.on('child_removed', snapshot  => {
         this.setState({ messages: this.state.messages.filter( message => message.key !== snapshot.key )})
   });
-}
+ }
+
 
     createMessage(e) {
       e.preventDefault();
+      console.log(this.state.sentAt);
         this.messagesRef.push({
           username: this.props.user ? this.props.user.displayName : "Guest",
           content: this.state.content,
           sentAt: this.state.sentAt,
           roomId: this.state.roomId
-
-
       });
         this.setState({username: "", content: "", sentAt: ""});
-
-    }
+      }
 
   handleChange(e) {
     e.preventDefault();
@@ -57,15 +57,8 @@ class MessageList extends Component {
   this.messagesRef.child(message.key).remove();
 }
 
-updateMessage(e){
-  e.preventDefault();
-    const updatedTime = this.props.firebase.database.ServerValue.TIMESTAMP;
-    const messagesRef = this.props.firebase.database().ref("messages/" + "/" + this.state.editMe);
-    const updates = {};
-    updates["/content"] = this.input.value;
-    updates["/updatedTime"] = updatedTime;
-    messagesRef.update(updates);
-    this.setState({editMe: ""});
+editMessage(message) {
+  this.messagesRef.update(message);
 }
 
 
@@ -78,13 +71,12 @@ updateMessage(e){
     let currentMessages = (
       this.state.messages.map((message) => {
         if(message.roomId === activeRoom) {
-          return <ol key = {message.key}> {message.username} {message.content} {format}
+          return
+          <ol key = {message.key}>
+          {message.username} {message.content} {format}
           <button onClick = { () => this.deleteMessage(message)}>Useless Message?</button>
-          <form onSubmit={this.updatedMessage}>
           <textarea type="text" defaultValue={message.content}/>
-          <button onClick={ (e) => this.setState({editMe: ""})}Edit/>
-          </form>
-
+          <button onClick={ () => this.editMessage(message)}>edit</button>
           </ol>
         }
         return null;
