@@ -19,13 +19,12 @@ class MessageList extends Component {
 
   componentDidMount() {
   this.messagesRef.on('child_added', snapshot => {
-    var message = {snap: snapshot.val()}
-
+    var message = snapshot.val()
     message.key = snapshot.key;
-    this.setState({ messages: this.state.messages.concat( message.snap ) })
+    this.setState({ messages: this.state.messages.concat( message ) })
   });
     this.messagesRef.on('child_removed', snapshot  => {
-        this.setState({ messages: this.state.messages.filter( message.snap => message.key !== snapshot.key )})
+        this.setState({ messages: this.state.messages.filter( message => message.key !== snapshot.key )})
   });
  }
 
